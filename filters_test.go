@@ -137,3 +137,16 @@ func (s *TestSuite1) TestFilterPrintError(c *C) {
 	err3 := 10
 	c.Assert(getResult("<h1>{{ err|printerror }}</h1>", pongo2.Context{"err": err3}), Equals, "<h1>10</h1>")
 }
+
+func (s *TestSuite1) TestFilterSolidLineBreaksBR(c *C) {
+	text := "simpleerror"
+	c.Assert(getResult("{{ text|solidlinebreaksbr: '6'|safe }}", pongo2.Context{"text": text}), Equals, "simple<br />error")
+
+	c.Assert(getResult("{{ text|solidlinebreaksbr: '6, ' }}", pongo2.Context{"text": text}), Equals, "simple error")
+
+	text = "one 🐘 and three 🐋"
+	c.Assert(getResult("{{ text|solidlinebreaksbr: '6'|safe }}", pongo2.Context{"text": text}), Equals, "one 🐘 <br />and th<br />ree 🐋")
+
+	text = "one 🐘 and three 🐋"
+	c.Assert(getResult("{{ text|solidlinebreaksbr: '6'|safe }}", pongo2.Context{"text": text}), Equals, "one 🐘 <br />and th<br />ree 🐋")
+}
