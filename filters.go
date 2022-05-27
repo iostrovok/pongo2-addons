@@ -45,6 +45,9 @@ func init() {
 	// Halpers
 	// Print error as error.Error()
 	pongo2.RegisterFilter("printerror", filterPrintError)
+
+	// break line each N symbols
+	pongo2.RegisterFilter("solidlinebreaksbr", filterSolidLineBreaksBR)
 }
 
 func filterMarkdown(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -338,4 +341,42 @@ func filterPrintError(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *po
 	}
 
 	return pongo2.AsValue(i), nil
+}
+
+func filterSolidLineBreaksBR(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	eachBr := pongoParam(param, 0).Integer()
+	line := in.String()
+
+	if len(line) == 0 || eachBr < 2 {
+		return in, nil
+	}
+
+	breaker := pongoParam(param, 1).String()
+	if breaker == "" {
+		breaker = "<br />"
+	}
+
+	var b bytes.Buffer
+	data := []rune(line)
+	for i := 0; i < len(data); i++ {
+		b.WriteString(string(data[i]))
+		if (i+1)%eachBr == 0 && i != len(data)-1 {
+			b.WriteString(breaker)
+		}
+	}
+
+	return pongo2.AsValue(b.String()), nil
+}
+
+func pongoParam(param *pongo2.Value, point int) *pongo2.Value {
+	if param.Len() > point && point > -1 {
+		endings := strings.Split(param.String(), ",")
+		for i := range endings {
+			if i == point {
+				return pongo2.AsValue(endings[i])
+			}
+		}
+	}
+
+	return pongo2.AsValue("")
 }
