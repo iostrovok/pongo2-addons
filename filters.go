@@ -43,11 +43,16 @@ func init() {
 	pongo2.RegisterFilter("imultiply", filterIMultiply)
 
 	// Halpers
-	// Print error as error.Error()
+	// prints error as error.Error()
 	pongo2.RegisterFilter("printerror", filterPrintError)
 
 	// break line each N symbols
 	pongo2.RegisterFilter("solidlinebreaksbr", filterSolidLineBreaksBR)
+
+	// range integers for 0 to N-1
+	pongo2.RegisterFilter("range0", filterRange0)
+	// range integers for 1 to N
+	pongo2.RegisterFilter("range", filterRange)
 }
 
 func filterMarkdown(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -366,6 +371,38 @@ func filterSolidLineBreaksBR(in *pongo2.Value, param *pongo2.Value) (*pongo2.Val
 	}
 
 	return pongo2.AsValue(b.String()), nil
+}
+
+func filterRange(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	to := pongoParam(param, 0).Integer()
+	if to < 1 {
+		return nil, &pongo2.Error{
+			Sender:    "filter:filterRange",
+			OrigError: errors.New("range-value is less than 1"),
+		}
+	}
+
+	out := make([]int, to, to)
+	for i := 1; i <= to; i++ {
+		out[i-1] = i
+	}
+	return pongo2.AsValue(out), nil
+}
+
+func filterRange0(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	to := pongoParam(param, 0).Integer()
+	if to < 0 {
+		return nil, &pongo2.Error{
+			Sender:    "filter:range0",
+			OrigError: errors.New("range0-value is less than 0"),
+		}
+	}
+
+	out := make([]int, to, to)
+	for i := 0; i < to; i++ {
+		out[i] = i
+	}
+	return pongo2.AsValue(out), nil
 }
 
 func pongoParam(param *pongo2.Value, point int) *pongo2.Value {

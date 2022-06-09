@@ -149,4 +149,28 @@ func (s *TestSuite1) TestFilterSolidLineBreaksBR(c *C) {
 
 	text = "one 🐘 and three 🐋"
 	c.Assert(getResult("{{ text|solidlinebreaksbr: '6'|safe }}", pongo2.Context{"text": text}), Equals, "one 🐘 <br />and th<br />ree 🐋")
+
+	c.Assert(getResult("{{ 'one 🐘 and three 🐋'|solidlinebreaksbr: '6,<s>'|safe }}", pongo2.Context{"text": text}), Equals, "one 🐘 <s>and th<s>ree 🐋")
+}
+
+func (s *TestSuite1) TestFilterRange0(c *C) {
+	text := "-"
+	c.Assert(getResult("{% for t in ''|range0: '6' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "0-1-2-3-4-5-")
+
+	c.Assert(getResult("{% for t in ''|range0: '0' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+
+	// error
+	c.Assert(getResult("{% for t in ''|range0: '' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+	c.Assert(getResult("{% for t in ''|range0: '-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+}
+
+func (s *TestSuite1) TestFilterRange(c *C) {
+	text := "-"
+	c.Assert(getResult("{% for t in ''|range: '6' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "1-2-3-4-5-6-")
+
+	c.Assert(getResult("{% for t in ''|range: '1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "1-")
+
+	// error
+	c.Assert(getResult("{% for t in ''|range: '0' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+	c.Assert(getResult("{% for t in ''|range: '-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
 }
