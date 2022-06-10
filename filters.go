@@ -374,34 +374,73 @@ func filterSolidLineBreaksBR(in *pongo2.Value, param *pongo2.Value) (*pongo2.Val
 }
 
 func filterRange(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	to := pongoParam(param, 0).Integer()
-	if to < 1 {
+	from := pongoParam(param, 0).Integer()
+
+	if pongoParam(param, 1).String() == "" {
+		// one argument call
+		if from < 1 {
+			return nil, &pongo2.Error{
+				Sender:    "filter:filterRange",
+				OrigError: errors.New("range-value is less than 1"),
+			}
+		}
+
+		out := make([]int, from, from)
+		for i := 1; i <= from; i++ {
+			out[i-1] = i
+		}
+
+		return pongo2.AsValue(out), nil
+	}
+
+	to := pongoParam(param, 1).Integer()
+	if to < from {
 		return nil, &pongo2.Error{
-			Sender:    "filter:filterRange",
-			OrigError: errors.New("range-value is less than 1"),
+			Sender:    "filter:range0",
+			OrigError: errors.New("range0 second parameter is less than first"),
 		}
 	}
 
-	out := make([]int, to, to)
-	for i := 1; i <= to; i++ {
-		out[i-1] = i
+	out := make([]int, to-from+1, to-from+1)
+	for i := from; i <= to; i++ {
+		out[i-from] = i
 	}
 	return pongo2.AsValue(out), nil
 }
 
 func filterRange0(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	to := pongoParam(param, 0).Integer()
-	if to < 0 {
+	from := pongoParam(param, 0).Integer()
+
+	if pongoParam(param, 1).String() == "" {
+		// one argument call
+		if from < 0 {
+			return nil, &pongo2.Error{
+				Sender:    "filter:range0",
+				OrigError: errors.New("range0 param is less than 0"),
+			}
+		}
+
+		out := make([]int, from, from)
+		for i := 0; i < from; i++ {
+			out[i] = i
+		}
+
+		return pongo2.AsValue(out), nil
+	}
+
+	to := pongoParam(param, 1).Integer()
+	if to < from {
 		return nil, &pongo2.Error{
 			Sender:    "filter:range0",
-			OrigError: errors.New("range0-value is less than 0"),
+			OrigError: errors.New("range0 second parameter is less than first"),
 		}
 	}
 
-	out := make([]int, to, to)
-	for i := 0; i < to; i++ {
-		out[i] = i
+	out := make([]int, to-from, to-from)
+	for i := from; i < to; i++ {
+		out[i-from] = i
 	}
+
 	return pongo2.AsValue(out), nil
 }
 
