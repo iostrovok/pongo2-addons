@@ -164,6 +164,18 @@ func (s *TestSuite1) TestFilterRange0(c *C) {
 	c.Assert(getResult("{% for t in ''|range0: '-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
 }
 
+func (s *TestSuite1) TestFilterRange0ToFrom(c *C) {
+	text := "-"
+	c.Assert(getResult(`{% for t in ''|range0: '-1,6' %}{{ t }}{{ text }}{% endfor %}`, pongo2.Context{"text": text}), Equals, "-1-0-1-2-3-4-5-")
+
+	c.Assert(getResult("{% for t in ''|range0: '0' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+	c.Assert(getResult("{% for t in ''|range0: '10,12' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "10-11-")
+
+	// error
+	c.Assert(getResult("{% for t in ''|range0: '-1,-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+	c.Assert(getResult("{% for t in ''|range0: '10,-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+}
+
 func (s *TestSuite1) TestFilterRange(c *C) {
 	text := "-"
 	c.Assert(getResult("{% for t in ''|range: '6' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "1-2-3-4-5-6-")
@@ -173,4 +185,17 @@ func (s *TestSuite1) TestFilterRange(c *C) {
 	// error
 	c.Assert(getResult("{% for t in ''|range: '0' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
 	c.Assert(getResult("{% for t in ''|range: '-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+}
+
+func (s *TestSuite1) TestFilterRangeToFrom(c *C) {
+	text := "-"
+	c.Assert(getResult(`{% for t in ''|range: '-1,6' %}{{ t }}{{ text }}{% endfor %}`, pongo2.Context{"text": text}), Equals, "-1-0-1-2-3-4-5-6-")
+	c.Assert(getResult(`{% for t in ''|range: '-1,6' %}{{ t }}.{% endfor %}`, pongo2.Context{"text": text}), Equals, "-1.0.1.2.3.4.5.6.")
+
+	c.Assert(getResult("{% for t in ''|range: '0' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
+	c.Assert(getResult("{% for t in ''|range: '10,12' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "10-11-12-")
+	c.Assert(getResult("{% for t in ''|range: '-1,-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "-1-")
+
+	// error
+	c.Assert(getResult("{% for t in ''|range: '10,-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
 }

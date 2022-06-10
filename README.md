@@ -85,10 +85,19 @@ I want to thank the authors of these libraries (which are being used in `pongo2-
 // result "0a1a2a3a4a5a"
 {% for t in ''|range0: '6' %}{{ t }}a{% endfor %}
 
+// from -> to ranges
+// result "-1.0.1.2.3.4.5.6."
+{% for t in ''|range: '-1,6' %}{{ t }}.{% endfor %}
+
+// result "-1.0.1.2.3.4.5."
+{% for t in ''|range0: '-1,6' %}{{ t }}.{% endfor %}
+
 // result "one 🐘 <br/>and th<br/>ree 🐋"
 {{ 'one 🐘 and three 🐋'|solidlinebreaksbr: '6'|safe }}
 
 // result "one 🐘 <s>and th<s>ree 🐋"
-{{ 'one 🐘 and three 🐋'|solidlinebreaksbr: '6,<s>'|safe }}
+    {{ 'one 🐘 and three 🐋'|solidlinebreaksbr: '6,<s>'|safe }}
+
+
 
 ```
