@@ -199,3 +199,18 @@ func (s *TestSuite1) TestFilterRangeToFrom(c *C) {
 	// error
 	c.Assert(getResult("{% for t in ''|range: '10,-1' %}{{ t }}{{ text }}{% endfor %}", pongo2.Context{"text": text}), Equals, "")
 }
+
+func (s *TestSuite1) TestFilterJSON(c *C) {
+	T := struct {
+		A string `json:"a"`
+		B int    `json:"b"`
+	}{
+		A: "one 🐘 and three 🐋",
+		B: 10,
+	}
+
+	c.Assert(getResult("{{ tojs|json|safe }}", pongo2.Context{"tojs": T}), Equals, `{"a":"one 🐘 and three 🐋","b":10}`)
+	c.Assert(getResult("{{ tojs|json|safe }}", pongo2.Context{"tojs": nil}), Equals, `null`)
+	c.Assert(getResult("{{ tojs|json|safe }}", pongo2.Context{"tojs": ""}), Equals, `""`)
+	c.Assert(getResult("{{ tojs|json|safe }}", pongo2.Context{"tojs": "A"}), Equals, `"A"`)
+}
