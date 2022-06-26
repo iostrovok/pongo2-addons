@@ -2,6 +2,7 @@ package pongo2addons
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -53,6 +54,9 @@ func init() {
 	pongo2.RegisterFilter("range0", filterRange0)
 	// range integers for 1 to N
 	pongo2.RegisterFilter("range", filterRange)
+
+	// range integers for 1 to N
+	pongo2.RegisterFilter("json", filterJSON)
 }
 
 func filterMarkdown(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -346,6 +350,18 @@ func filterPrintError(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *po
 	}
 
 	return pongo2.AsValue(i), nil
+}
+
+func filterJSON(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	js, err := json.Marshal(in.Interface())
+	if err != nil {
+		return nil, &pongo2.Error{
+			Sender:    "filter:json",
+			OrigError: err,
+		}
+	}
+
+	return pongo2.AsValue(string(js)), nil
 }
 
 func filterSolidLineBreaksBR(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
