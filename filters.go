@@ -13,7 +13,7 @@ import (
 
 	"github.com/extemporalgenome/slug"
 	"github.com/flosch/go-humanize"
-	"github.com/flosch/pongo2/v5"
+	"github.com/flosch/pongo2/v6"
 	"github.com/russross/blackfriday/v2"
 )
 
@@ -57,6 +57,9 @@ func init() {
 
 	// range integers for 1 to N
 	pongo2.RegisterFilter("json", filterJSON)
+
+	// range integers for 1 to N
+	pongo2.RegisterFilter("joinBr", filterJoinBr)
 }
 
 func filterMarkdown(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -383,6 +386,23 @@ func filterSolidLineBreaksBR(in *pongo2.Value, param *pongo2.Value) (*pongo2.Val
 		b.WriteString(string(data[i]))
 		if (i+1)%eachBr == 0 && i != len(data)-1 {
 			b.WriteString(breaker)
+		}
+	}
+
+	return pongo2.AsValue(b.String()), nil
+}
+
+func filterJoinBr(in *pongo2.Value, _ *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
+	if !in.CanSlice() {
+		return in, nil
+	}
+
+	var b bytes.Buffer
+	l := in.Len() - 1
+	for i := 0; i <= l; i++ {
+		b.WriteString(in.Index(i).String())
+		if i < l {
+			b.WriteString("\n")
 		}
 	}
 

@@ -13,6 +13,7 @@ Install via `go get -u github.com/flosch/pongo2-addons`. All dependencies will b
 Simply add the following import line **after** importing pongo2:
 
     _ "github.com/flosch/pongo2-addons"
+    // or github.com/iostrovok/pongo2-addons for extend version
 
 All additional filters/tags will be registered automatically.
 
@@ -59,6 +60,13 @@ All additional filters/tags will be registered automatically.
     - **range** returns range integers (slice) for 1 to N.
     - **range0** returns range integers (slice) for 0 to N-1
 
+- Json
+    - **json|safe** returns JSON.Marshal(...) string for value.
+
+- Join with "\n"
+    - **jsonBr** returns the merged array as a string with "\n" as the delimiter.
+
+
 ### Tags
 
 (nothing yet)
@@ -98,6 +106,8 @@ I want to thank the authors of these libraries (which are being used in `pongo2-
 // result "one 🐘 <s>and th<s>ree 🐋"
     {{ 'one 🐘 and three 🐋'|solidlinebreaksbr: '6,<s>'|safe }}
 
-
+// result "A\nB\nC\nD\nE"
+    // T => []string{"A", "B", "C", "D", "E"}
+    {{ T|joinBr }}
 
 ```

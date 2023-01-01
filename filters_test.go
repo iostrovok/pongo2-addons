@@ -7,7 +7,7 @@ import (
 
 	. "github.com/iostrovok/check"
 
-	"github.com/flosch/pongo2/v5"
+	"github.com/flosch/pongo2/v6"
 )
 
 // Hook up gocheck into the "go test" runner.
@@ -213,4 +213,22 @@ func (s *TestSuite1) TestFilterJSON(c *C) {
 	c.Assert(getResult("{{ tojs|json|safe }}", pongo2.Context{"tojs": nil}), Equals, `null`)
 	c.Assert(getResult("{{ tojs|json|safe }}", pongo2.Context{"tojs": ""}), Equals, `""`)
 	c.Assert(getResult("{{ tojs|json|safe }}", pongo2.Context{"tojs": "A"}), Equals, `"A"`)
+}
+
+func (s *TestSuite1) TestFilterJoinBr(c *C) {
+	var T []string
+	c.Assert(getResult("{{ T|joinBr }}", pongo2.Context{"T": T}), Equals, ``)
+
+	T = make([]string, 0)
+	c.Assert(getResult("{{ T|joinBr }}", pongo2.Context{"T": T}), Equals, ``)
+
+	T = []string{"A"}
+	c.Assert(getResult("{{ T|joinBr }}", pongo2.Context{"T": T}), Equals, `A`)
+
+	T = []string{"A", "B"}
+	c.Assert(getResult("{{ T|joinBr }}", pongo2.Context{"T": T}), Equals, "A\nB")
+
+	T = []string{"A", "B", "C", "D", "E"}
+	c.Assert(getResult("{{ T|joinBr }}", pongo2.Context{"T": T}), Equals, "A\nB\nC\nD\nE")
+
 }
